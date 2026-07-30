@@ -1,3 +1,67 @@
+import re
+
+
+def _validar_tipo_doc(valor):
+    """Valida tipo de documento en tiempo real."""
+    valor = valor.upper()
+    if valor not in ["CC", "TI", "CE"]:
+        return False, "Tipo de documento inválido. Opciones: CC, TI, CE"
+    return True, valor
+
+def _validar_documento(valor):
+    """Valida número de documento en tiempo real."""
+    if not valor.isdigit():
+        return False, "El documento debe contener solo dígitos numéricos."
+    if len(valor) < 4:
+        return False, "El documento debe tener al menos 4 dígitos."
+    return True, valor
+
+def _validar_nombre(valor):
+    """Valida nombre completo en tiempo real."""
+    valor = valor.strip().title()
+    if len(valor) < 3:
+        return False, "El nombre debe tener al menos 3 caracteres."
+    if not all(c.isalpha() or c.isspace() for c in valor):
+        return False, "El nombre solo debe contener letras y espacios."
+    return True, valor
+
+def _validar_ficha(valor):
+    """Valida número de ficha en tiempo real."""
+    if not valor.isdigit():
+        return False, "La ficha debe ser un valor numérico."
+    if len(valor) < 4:
+        return False, "La ficha debe tener al menos 4 dígitos."
+    return True, valor
+
+def _validar_programa(valor):
+    """Valida programa de formación en tiempo real."""
+    valor = valor.strip().title()
+    if len(valor) < 3:
+        return False, "El programa debe tener al menos 3 caracteres."
+    return True, valor
+
+def _validar_email(valor):
+    """Valida correo electrónico en tiempo real."""
+    valor = valor.strip().lower()
+    email_regex = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+    if not re.match(email_regex, valor):
+        return False, "Correo inválido. Ejemplo: usuario@dominio.com"
+    return True, valor
+
+
+def _input_validado(prompt, validator, field_name):
+    """Solicita input y valida en tiempo real, repitiendo hasta que sea válido."""
+    while True:
+        valor = input(prompt).strip()
+        if not valor:
+            print(f"  ⚠️  El campo '{field_name}' no puede estar vacío.")
+            continue
+        ok, resultado = validator(valor)
+        if ok:
+            return resultado
+        print(f"  ⚠️  {resultado}")
+
+
 def get_trainee_input():
     """Solicita al usuario los datos del aprendiz incluyendo el correo."""
     print("\n--- 📝 REGISTRO DE APRENDIZ ---")
