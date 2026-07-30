@@ -45,3 +45,49 @@ def display_confirm_next():
 
     next = input("").strip().lower()
     return next == "s"
+
+
+# === NUEVAS FUNCIONES ===
+
+def show_menu():
+    print("\n" + "="*50)
+    print("   🎓 SISTEMA APRENDICES SENA")
+    print("="*50)
+    for k,v in {"1":"Registrar","2":"Editar","3":"Eliminar",
+                 "4":"Buscar","5":"Listar","6":"Exportar CSV","7":"Salir"}.items():
+        print(f"  {k}. {v}")
+    print("="*50)
+    return input("Opción: ").strip()
+
+def ask_doc(action):
+    print(f"\n--- 🔧 Documento a {action} ---")
+    return input(f"Doc del aprendiz a {action}: ").strip()
+
+def ask_edit_data(t):
+    print("\n--- ✏️ Editar (Enter = mantener) ---")
+    def q(prompt, default):
+        v = input(f"{prompt} [{default}]: ").strip()
+        return v or default
+    return {
+        "tipo_doc": q("Tipo doc", t["tipo_doc"]).upper(),
+        "documento": t["documento"],
+        "nombre": q("Nombre", t["nombre"]).title(),
+        "ficha": q("Ficha", t["ficha"]),
+        "programa": q("Programa", t["programa"]).title(),
+        "email": q("Email", t["email"]).lower(),
+    }
+
+def confirm(msg):
+    return input(f"\n⚠️ {msg} (s/n): ").strip().lower() == "s"
+
+def ask_keyword():
+    print("\n--- 🔍 Buscar ---")
+    return input("Nombre o ficha: ").strip()
+
+def show_results(res, kw):
+    if not res:
+        print(f"\nSin resultados para '{kw}'")
+        return
+    print(f"\n--- {len(res)} resultado(s) ---")
+    for t in res:
+        print(f"  {t['tipo_doc']} {t['documento']} | {t['nombre']} | F:{t['ficha']} | {t['programa']} | {t['email']}")

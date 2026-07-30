@@ -74,3 +74,44 @@ def register_trainee_view():
 def status_view():
     all_trainees = trainee_model.get_all()
     trainee_template.display_trainees_list(all_trainees)
+
+
+# === NUEVAS VISTAS ===
+
+def edit_view():
+    doc = trainee_template.ask_doc("editar")
+    t = trainee_model.search_by_document(doc)
+    if not t:
+        trainee_template.display_message({"type": "error", "text": f"Documento {doc} no encontrado."})
+        return
+    data = trainee_template.ask_edit_data(t)
+    ok, err = validate_trainee_data(data)
+    if not ok:
+        trainee_template.display_message({"type": "error", "text": err})
+        return
+    if trainee_model.upd_trainee(doc, data):
+        trainee_template.display_message({"type": "success", "text": f"✅ {data['nombre']} actualizado."})
+
+def delete_view():
+    doc = trainee_template.ask_doc("eliminar")
+    t = trainee_model.search_by_document(doc)
+    if not t:
+        trainee_template.display_message({"type": "error", "text": f"Documento {doc} no existe."})
+        return
+    if not trainee_template.confirm(f"¿Eliminar a {t['nombre']}?"):
+        trainee_template.display_message({"type": "info", "text": "Cancelado."})
+        return
+    if trainee_model.rm_trainee(doc):
+        trainee_template.display_message({"type": "success", "text": f"🗑️ {t['nombre']} eliminado."})
+
+def search_view():
+    kw = trainee_template.ask_keyword()
+    res = trainee_model.find_trainees(kw)
+    trainee_template.show_results(res, kw)
+
+def export_view():
+    if not trainee_model.get_all():
+        trainee_template.display_message({"type": "error", "text": "No hay datos para exportar."})
+        return
+    p = trainee_model.save_csv()
+    trainee_template.display_message({"type": "success", "text": f"📁 Exportado a: {p}"})

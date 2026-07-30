@@ -47,3 +47,41 @@ def register_trainee(new_trainee):
     trainees.append(new_trainee)
     save_to_json()
     return True
+
+
+# === FUNCIONES NUEVAS ===
+
+def upd_trainee(doc_id, data):
+    """Actualiza aprendiz por documento. Retorna True si existe."""
+    for i, t in enumerate(trainees):
+        if t["documento"] == doc_id:
+            trainees[i] = {**t, **data, "documento": doc_id}
+            save_to_json()
+            return True
+    return False
+
+def rm_trainee(doc_id):
+    """Elimina aprendiz por documento usando filter."""
+    global trainees
+    prev = len(trainees)
+    trainees = [t for t in trainees if t["documento"] != doc_id]
+    if len(trainees) < prev:
+        save_to_json()
+        return True
+    return False
+
+def find_trainees(keyword):
+    """Busca por nombre (parcial) o ficha (exacta)."""
+    k = keyword.lower()
+    return [t for t in trainees if k in t["nombre"].lower() or keyword == t["ficha"]]
+
+def save_csv(path=None):
+    """Exporta a CSV manualmente (sin csv module)."""
+    path = path or str(DATA_DIR / "exported_trainees.csv")
+    cols = ["tipo_doc","documento","nombre","ficha","programa","email"]
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(",".join(cols) + "\n")
+        for t in trainees:
+            row = ",".join(f'"{t[c]}"' for c in cols)
+            f.write(row + "\n")
+    return path
