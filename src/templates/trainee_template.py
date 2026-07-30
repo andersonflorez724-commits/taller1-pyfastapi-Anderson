@@ -63,14 +63,40 @@ def _input_validado(prompt, validator, field_name):
 
 
 def get_trainee_input():
-    """Solicita al usuario los datos del aprendiz incluyendo el correo."""
+    """Solicita al usuario los datos del aprendiz con validación en tiempo real."""
     print("\n--- 📝 REGISTRO DE APRENDIZ ---")
-    id = input("Número de documento: ").strip()
-    type_id = input("Tipo de documento (CC/TI/CE): ").strip().upper()
-    name = input("Nombre completo: ").strip().title()
-    group_code = input("Número de Ficha: ").strip()
-    program = input("Programa de Formación: ").strip().title()
-    email = input("Correo electrónico: ").strip().lower()
+    print("(Cada campo se valida en tiempo real)")
+    
+    type_id = _input_validado(
+        "Tipo de documento (CC/TI/CE): ",
+        _validar_tipo_doc,
+        "Tipo de documento"
+    )
+    id = _input_validado(
+        "Número de documento: ",
+        _validar_documento,
+        "Documento"
+    )
+    name = _input_validado(
+        "Nombre completo: ",
+        _validar_nombre,
+        "Nombre"
+    )
+    group_code = _input_validado(
+        "Número de Ficha: ",
+        _validar_ficha,
+        "Ficha"
+    )
+    program = _input_validado(
+        "Programa de Formación: ",
+        _validar_programa,
+        "Programa"
+    )
+    email = _input_validado(
+        "Correo electrónico: ",
+        _validar_email,
+        "Correo electrónico"
+    )
 
     return {
         "tipo_doc": type_id,
@@ -127,18 +153,29 @@ def ask_doc(action):
     print(f"\n--- 🔧 Documento a {action} ---")
     return input(f"Doc del aprendiz a {action}: ").strip()
 
-def ask_edit_data(t):
-    print("\n--- ✏️ Editar (Enter = mantener) ---")
-    def q(prompt, default):
+def _input_validado_editar(prompt, default, validator, field_name):
+    """Solicita input para edición con validación en tiempo real."""
+    while True:
         v = input(f"{prompt} [{default}]: ").strip()
-        return v or default
+        if not v:
+            return default
+        ok, resultado = validator(v)
+        if ok:
+            return resultado
+        print(f"  ⚠️  {resultado}")
+
+
+def ask_edit_data(t):
+    """Solicita edición de datos con validación en tiempo real."""
+    print("\n--- ✏️ Editar (Enter = mantener valor actual) ---")
+    print("(La validación ocurre en tiempo real al escribir)")
     return {
-        "tipo_doc": q("Tipo doc", t["tipo_doc"]).upper(),
+        "tipo_doc": _input_validado_editar("Tipo doc", t["tipo_doc"], _validar_tipo_doc, "Tipo doc"),
         "documento": t["documento"],
-        "nombre": q("Nombre", t["nombre"]).title(),
-        "ficha": q("Ficha", t["ficha"]),
-        "programa": q("Programa", t["programa"]).title(),
-        "email": q("Email", t["email"]).lower(),
+        "nombre": _input_validado_editar("Nombre", t["nombre"], _validar_nombre, "Nombre"),
+        "ficha": _input_validado_editar("Ficha", t["ficha"], _validar_ficha, "Ficha"),
+        "programa": _input_validado_editar("Programa", t["programa"], _validar_programa, "Programa"),
+        "email": _input_validado_editar("Email", t["email"], _validar_email, "Email"),
     }
 
 def confirm(msg):
