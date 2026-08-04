@@ -1,0 +1,9 @@
+# Dependencias de ejecución de la aplicación
+fastapi>=0.110.0
+uvicorn>=0.30.0
+pydantic>=2.0.0
+httpx>=0.30.0
+
+# Dependencias para ejecutar los tests
+pytest
+pytest-cov
